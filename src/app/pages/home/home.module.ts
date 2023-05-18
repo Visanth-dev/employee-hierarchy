@@ -1,20 +1,20 @@
 import { NgModule } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 
-import { HttpClientModule } from '@angular/common/http';
-
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatInputModule } from '@angular/material/input';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatCardModule} from '@angular/material/card';
 
 import { FormsModule } from '@angular/forms';
-
-import { MatTabsModule } from '@angular/material/tabs';
-
-import {MatInputModule} from '@angular/material/input';
 
 @NgModule({
   declarations: [HomeComponent],
@@ -22,11 +22,14 @@ import {MatInputModule} from '@angular/material/input';
     CommonModule,
     HomeRoutingModule,
     HttpClientModule,
-    MatSlideToggleModule,
     MatAutocompleteModule,
     FormsModule,
     MatTabsModule,
     MatInputModule,
+    MatGridListModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatCardModule,
   ],
 })
 export class HomeModule {}
