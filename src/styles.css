@@ -29,3 +29,15 @@ body {
     margin-bottom: 28px;
     padding-bottom: 10px;
   }
+
+  .form-add-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .employee-mat-card {
+    margin-top: 50px;
+    width: 300px;
+  }
