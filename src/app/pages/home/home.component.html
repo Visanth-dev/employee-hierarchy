@@ -1,44 +1,61 @@
-<form (submit)="getHierarchy()">
-  <input
-    type="text"
-    [(ngModel)]="name"
-    name="name"
-    (ngModelChange)="getMatchingEmployees()"
-    matInput
-    [matAutocomplete]="auto"
-  />
+<div class="center container-fluid">
+  <a>Hierarchy</a>
+  Employee:
+  <a>Add</a>
+  <a>Update</a>
+</div>
 
-  <input type="submit" value="Search" />
-  <mat-autocomplete #auto="" matAutocomplete>
-    <mat-option
-      *ngFor="let employee of employees | async"
-      [value]="employee.name"
-      (click)="setEmployee(employee)"
-    >
-      <h3>{{ employee.id }} | {{ employee.name }}</h3>
-    </mat-option>
-  </mat-autocomplete>
-</form>
+<div class="center">
+  <form (submit)="getHierarchy()">
+    <!-- <mat-form-field class="mat-form-field"> -->
+    <!-- <mat-label>Name</mat-label> -->
+    <input
+      class="input"
+      type="text"
+      [(ngModel)]="name"
+      name="name"
+      (ngModelChange)="getMatchingEmployees()"
+      matInput
+      [matAutocomplete]="auto"
+    />
+    <!-- </mat-form-field> -->
+
+    <mat-autocomplete #auto="" matAutocomplete>
+      <mat-option
+        *ngFor="let employee of employees | async"
+        [value]="employee.name"
+        (click)="setEmployee(employee)"
+      >
+        <h3>{{ employee.id }} | {{ employee.name }}</h3>
+      </mat-option>
+    </mat-autocomplete>
+
+    <button mat-raised-button color="primary" type="submit" value="Search">
+      Search
+    </button>
+  </form>
+</div>
 
 <div *ngIf="commandChain && subordinates">
-  <h3>{{ employee.name }}</h3>
+  <h3 class="center">{{ employee.name }}</h3>
   <mat-tab-group
     mat-stretch-tabs="false"
     mat-align-tabs="center"
     animationDuration="750ms"
+    dynamicHeight
   >
     <mat-tab label="Command Chain">
-      <div class="center">
-        <h3 *ngFor="let employee of commandChain | async">
+      <div>
+        <h3 class="center" *ngFor="let employee of commandChain | async">
           {{ employee.name }}
         </h3>
       </div>
     </mat-tab>
 
     <mat-tab label="Subordinates">
-      <h3 *ngFor="let employee of subordinates | async">
-        {{ employee.name }}
-      </h3>
+      <mat-card-content appearance="raised" class="center" *ngFor="let employee of subordinates | async">
+        <h3>{{ employee.name }}</h3>
+      </mat-card-content>
     </mat-tab>
   </mat-tab-group>
 </div>
