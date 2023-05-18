@@ -1,4 +1,31 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+    height: 35px;
+  }
+
+  .mat-form-field {
+    height: 100px;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+  }
+
+  .mat-raised-button {
+    margin-bottom: 28px;
+    padding-bottom: 10px;
+  }
