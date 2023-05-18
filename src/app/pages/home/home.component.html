@@ -1,7 +1,7 @@
-<div class="center container-fluid">
-  <a>Hierarchy</a>
+<div class="center">
+  <a routerLink="/">Hierarchy</a>
   Employee:
-  <a>Add</a>
+  <a routerLink="/add">Add</a>
   <a>Update</a>
 </div>
 
@@ -26,7 +26,8 @@
         [value]="employee.name"
         (click)="setEmployee(employee)"
       >
-        <h3>{{ employee.id }} | {{ employee.name }}</h3>
+        <h6>ID : {{ employee.id }}</h6>
+        <h3>{{ employee.name }}</h3>
       </mat-option>
     </mat-autocomplete>
 
@@ -37,7 +38,19 @@
 </div>
 
 <div *ngIf="commandChain && subordinates">
-  <h3 class="center">{{ employee.name }}</h3>
+  <div class="center">
+    <mat-card class="employee-mat-card" appearance="raised">
+      <mat-card-header>
+        <mat-card-title>{{ employee.name }}</mat-card-title>
+        <mat-card-subtitle>ID: {{ employee.id }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-actions align="end">
+        <button mat-button>Update</button>
+        <button mat-button>Delete</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
   <mat-tab-group
     mat-stretch-tabs="false"
     mat-align-tabs="center"
@@ -53,9 +66,11 @@
     </mat-tab>
 
     <mat-tab label="Subordinates">
-      <mat-card-content appearance="raised" class="center" *ngFor="let employee of subordinates | async">
-        <h3>{{ employee.name }}</h3>
-      </mat-card-content>
+      <div>
+        <h3 class="center" *ngFor="let employee of subordinates | async">
+          {{ employee.name }}
+        </h3>
+      </div>
     </mat-tab>
   </mat-tab-group>
 </div>
