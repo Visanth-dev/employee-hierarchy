@@ -31,8 +31,9 @@ export class HomeComponent {
   }
 
   setEmployee(emp: Object) {
-    console.log(emp);
     this.employee = emp;
+    this.commandChain = null
+    this.subordinates = null
   }
 
   getHierarchy() {
@@ -44,11 +45,13 @@ export class HomeComponent {
     this.commandChain = this.http.get<Employee[]>(
       `http://localhost:5000/commandChain/${this.employee.id}`
     );
+    console.log(this.commandChain)
   }
 
   getSubordinates() {
     this.subordinates = this.http.get<Employee[]>(
       `http://localhost:5000/subordinates/${this.employee.id}`
     );
+    console.log(this.subordinates)
   }
 }
