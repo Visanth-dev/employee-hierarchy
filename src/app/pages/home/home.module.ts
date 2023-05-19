@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
+import { ReactiveFormsModule } from '@angular/forms';
+
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 
@@ -22,6 +24,7 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     HomeRoutingModule,
     HttpClientModule,
+    ReactiveFormsModule,
     MatAutocompleteModule,
     FormsModule,
     MatTabsModule,

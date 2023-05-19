@@ -12,12 +12,11 @@
     <input
       class="input"
       type="text"
-      [(ngModel)]="name"
-      name="name"
-      (ngModelChange)="getMatchingEmployees()"
+      [formControl]="nameControl"
       matInput
       [matAutocomplete]="auto"
     />
+
     <!-- </mat-form-field> -->
 
     <mat-autocomplete #auto="" matAutocomplete>

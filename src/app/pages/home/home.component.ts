@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
+import { FormControl } from '@angular/forms';
+
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { Observable, debounceTime } from 'rxjs';
 
 interface Employee {
   id: number;
@@ -15,25 +17,35 @@ interface Employee {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
-  name = '';
-  employee: any;
-  employees!: Observable<Employee[]> | null;
+export class HomeComponent implements OnInit {
+  employee!: Employee
+  employees!: Observable<Employee[]>;
   commandChain!: Observable<Employee[]> | null;
   subordinates!: Observable<Employee[]> | null;
 
-  constructor(private http: HttpClient) {}
+  nameControl = new FormControl();
 
-  getMatchingEmployees() {
-    this.employees = this.http.get<{ id: number; name: string }[]>(
-      `http://localhost:5000/search/${this.name}`
+  constructor(private http: HttpClient) {
+    
+  }
+
+  ngOnInit(): void {
+    this.nameControl.valueChanges.pipe(debounceTime(500)).subscribe((name) => {
+      this.getMatchingEmployees(name);
+    });
+  }
+
+  getMatchingEmployees(name: string): void {
+    console.log(name)
+    this.employees = this.http.get<Employee[]>(
+      `http://localhost:5000/search/${name}`
     );
   }
 
-  setEmployee(emp: Object) {
+  setEmployee(emp: Employee) {
+    this.commandChain = null;
+    this.subordinates = null;
     this.employee = emp;
-    this.commandChain = null
-    this.subordinates = null
   }
 
   getHierarchy() {
@@ -44,14 +56,12 @@ export class HomeComponent {
   getCommandChain() {
     this.commandChain = this.http.get<Employee[]>(
       `http://localhost:5000/commandChain/${this.employee.id}`
-    );
-    console.log(this.commandChain)
+    )
   }
 
   getSubordinates() {
     this.subordinates = this.http.get<Employee[]>(
       `http://localhost:5000/subordinates/${this.employee.id}`
     );
-    console.log(this.subordinates)
   }
 }
