@@ -2,15 +2,11 @@ import { Component, OnInit } from '@angular/core';
 
 import { FormControl } from '@angular/forms';
 
-import { HttpClient } from '@angular/common/http';
+import { debounceTime } from 'rxjs';
 
-import { Observable, debounceTime } from 'rxjs';
+import { Employee } from 'src/app/entities/employees';
 
-interface Employee {
-  id: number;
-  name: string;
-  superior_id?: number;
-}
+import { HierarchyService } from 'src/app/services/hierarchy.service';
 
 @Component({
   selector: 'app-home',
@@ -18,50 +14,48 @@ interface Employee {
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  employee!: Employee
-  employees!: Observable<Employee[]>;
-  commandChain!: Observable<Employee[]> | null;
-  subordinates!: Observable<Employee[]> | null;
+  public employee: Employee | null = {} as Employee;
+  public employees: Employee[] | null = [] as Employee[];
+  public commandChain: Employee[] | null = [] as Employee[];
+  public subordinates: Employee[] | null = [] as Employee[];
 
   nameControl = new FormControl();
 
-  constructor(private http: HttpClient) {
-    
-  }
+  constructor(private hierarchyService: HierarchyService) {}
 
   ngOnInit(): void {
     this.nameControl.valueChanges.pipe(debounceTime(500)).subscribe((name) => {
       this.getMatchingEmployees(name);
     });
+    this.hierarchyService.employees.subscribe((employees) => {
+      this.employees = employees;
+    });
+    this.hierarchyService.employee.subscribe((employee) => {
+      this.employee = employee;
+    });
+    this.hierarchyService.commandChain.subscribe((commandChain) => {
+      this.commandChain = commandChain;
+    });
+    this.hierarchyService.subordinates.subscribe((subordinates) => {
+      this.subordinates = subordinates;
+    });
   }
 
   getMatchingEmployees(name: string): void {
-    console.log(name)
-    this.employees = this.http.get<Employee[]>(
-      `http://localhost:5000/search/${name}`
-    );
+    this.hierarchyService.getMatchingEmployees(name);
   }
 
-  setEmployee(emp: Employee) {
+  getEmployee(employee: Employee) {
     this.commandChain = null;
     this.subordinates = null;
-    this.employee = emp;
+    this.hierarchyService.getEmployee(employee.id);
+    console.log(this.employee);
   }
 
   getHierarchy() {
-    this.getCommandChain();
-    this.getSubordinates();
-  }
-
-  getCommandChain() {
-    this.commandChain = this.http.get<Employee[]>(
-      `http://localhost:5000/commandChain/${this.employee.id}`
-    )
-  }
-
-  getSubordinates() {
-    this.subordinates = this.http.get<Employee[]>(
-      `http://localhost:5000/subordinates/${this.employee.id}`
-    );
+    if (this.employee) {
+      console.log(this.employee.id);
+      this.hierarchyService.getHierarchy(this.employee);
+    }
   }
 }
