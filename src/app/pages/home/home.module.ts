@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
@@ -16,13 +15,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatCardModule} from '@angular/material/card';
 
+import { NavbarModule } from 'src/app/shared/components/navbar/navbar.module';
+
 @NgModule({
   declarations: [HomeComponent],
   imports: [
     CommonModule,
     HomeRoutingModule,
-    HttpClientModule,
     ReactiveFormsModule,
+    NavbarModule,
     MatAutocompleteModule,
     FormsModule,
     MatTabsModule,
