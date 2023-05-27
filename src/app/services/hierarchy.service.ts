@@ -2,9 +2,14 @@ import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 
-import { Employee } from '../entities/employees';
+import { Employee } from '../entities/employee';
 
 import { BehaviorSubject } from 'rxjs';
+
+export interface Message {
+  error: string,
+  message: string,
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,15 +23,17 @@ export class HierarchyService {
   public subordinates = new BehaviorSubject<Employee[] | null>(
     [] as Employee[]
   );
+  public message = new BehaviorSubject<Message | null>(null)
 
   constructor(private http: HttpClient) {}
 
   getMatchingEmployees(name: string) {
     this.http
       .get<Employee[]>(`http://localhost:5000/search/${name}`)
-      .subscribe((emp) => {
-        this.employees.next(emp);
+      .subscribe((emps) => {
+        this.employees.next(emps);
       });
+      console.log(this.employees)
   }
 
   getEmployee(id: number) {
@@ -47,6 +54,14 @@ export class HierarchyService {
       .get<Employee[]>(`http://localhost:5000/subordinates/${employee.id}`)
       .subscribe((subordinates) => {
         this.subordinates.next(subordinates);
+      });
+  }
+
+  updateEmployee(employee: Employee) {
+    this.http
+      .post<Message>(`http://localhost:5000/update`, employee)
+      .subscribe((response) => {
+        this.message.next(response);
       });
   }
 }
