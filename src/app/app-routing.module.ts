@@ -10,7 +10,21 @@ const routes: Routes = [
   {
     path: 'add',
     loadChildren: () =>
-      import('./pages/form-add/form-add.module').then((m) => m.FormAddModule),
+      import('./pages/forms/forms.module').then(
+        (m) => m.FormUpdateModule
+      ),
+  },
+  {
+    path: 'update/:id/:name/:age/:address/:superior_id',
+    loadChildren: () =>
+      import('./pages/forms/forms.module').then(
+        (m) => m.FormUpdateModule
+      ),
+  },
+  {
+    path: 'delete',
+    loadChildren: () =>
+      import('./pages/delete/delete.module').then((m) => m.DeleteModule),
   },
 ];
 
