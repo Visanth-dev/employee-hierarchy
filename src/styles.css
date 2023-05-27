@@ -15,29 +15,21 @@ body {
   align-items: center;
 }
 
+.top-align {
+  margin-top: 2%;
+}
+
 .input {
-    height: 35px;
-  }
+  height: 35px;
+}
 
-  .mat-form-field {
-    height: 100px;
-    margin-bottom: 50px;
-    padding-bottom: 30px;
-  }
+.mat-form-field {
+  height: 100px;
+  margin-bottom: 50px;
+  padding-bottom: 30px;
+}
 
-  .mat-raised-button {
-    margin-bottom: 28px;
-    padding-bottom: 10px;
-  }
-
-  .form-add-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .employee-mat-card {
-    margin-top: 50px;
-    width: 300px;
-  }
+.mat-raised-button {
+  margin-bottom: 28px;
+  padding-bottom: 10px;
+}
