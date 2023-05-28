@@ -9,9 +9,13 @@ import { Employee } from 'src/app/entities/employee';
 import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 
+import { Router } from '@angular/router';
+
 export interface Message {
-  error: string;
   message: string;
+}
+export interface Error {
+  error: string;
 }
 
 @Component({
@@ -20,35 +24,41 @@ export interface Message {
   styleUrls: ['./forms.component.css'],
 })
 export class FormUpdateComponent implements OnInit {
-  public employee: Employee | null = {} as Employee;
   myForm = new FormGroup({
-    name: new FormControl(),
-    age: new FormControl(),
-    address: new FormControl(),
+    name: new FormControl(''),
+    age: new FormControl(0),
+    address: new FormControl(''),
     superior_id: new FormControl(),
   });
+  public mode = '';
+  public employee: Employee | null = {} as Employee;
   public employees: Employee[] | null = [] as Employee[];
-  public message: string | null = null;
-  public isMessage = false;
-
-  public nameControl = new FormControl();
+  public response: Message | Error | null = null;
 
   constructor(
     private route: ActivatedRoute,
-    private hierarchyService: HierarchyService
+    private hierarchyService: HierarchyService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
-    this.employee = {
-      id: Number(routeParams.get('id')),
-      name: String(routeParams.get('name')),
-      age: Number(routeParams.get('age')),
-      address: String(routeParams.get('address')),
-      superior_id: Number(routeParams.get('superior_id')),
-    };
+    const url = this.router.url;
 
-    if (this.isEmployee(this.employee)) {
+    if (url.includes('update')) {
+      this.mode = 'update';
+      this.employee = {
+        id: Number(routeParams.get('id')),
+        name: String(routeParams.get('name')),
+        age: Number(routeParams.get('age')),
+        address: String(routeParams.get('address')),
+        superior_id: Number(routeParams.get('superior_id')),
+      };
+    } else {
+      this.mode = 'add';
+    }
+
+    if (this.employee && this.isEmployee(this.employee)) {
       this.myForm.patchValue({
         name: this.employee.name,
         age: this.employee.age,
@@ -60,11 +70,12 @@ export class FormUpdateComponent implements OnInit {
     this.hierarchyService.employees.subscribe((emps) => {
       this.employees = emps;
     });
+
     this.myForm.controls.superior_id.valueChanges
       .pipe(debounceTime(500))
-      .subscribe((name) => {
-        if (name && isNaN(name)) {
-          this.searchMatchingSuperior(name);
+      .subscribe((superior) => {
+        if (superior && isNaN(superior)) {
+          this.searchMatchingSuperior(superior);
         }
       });
   }
@@ -86,22 +97,34 @@ export class FormUpdateComponent implements OnInit {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    console.log(this.myForm.value);
 
-    // this.employee?.name = this.myForm.controls.name
-    // if (this.myForm.controls.name === null) {
-    //   this.message = "Enter employee's name";
-    //   this.isMessage = true;
-    // }
-    if (this.employee && Object.keys(this.employee).length > 0) {
-      this.hierarchyService.updateEmployee(this.employee);
-      if (this.isMessage) {
-        this.isMessage = true;
+    if (
+      this.myForm.controls.name.value === '' ||
+      this.myForm.controls.age.value === null ||
+      this.myForm.controls.address.value === '' ||
+      this.myForm.controls.superior_id.value === ''
+    ) {
+      this.response = { error: 'Please fill all the fields' };
+      console.log(this.response);
+    } else {
+      if (this.employee) {
+        this.employee.name = String(this.myForm.controls.name.value);
+        this.employee.age = Number(this.myForm.controls.age.value);
+        this.employee.address = String(this.myForm.controls.address.value);
+        this.employee.superior_id = Number(
+          this.myForm.controls.superior_id.value
+        );
       }
     }
-  }
 
-  switchMessage() {
-    this.isMessage = false;
+    if (this.mode === 'update') {
+      if (this.employee && Object.keys(this.employee).length > 0) {
+        this.hierarchyService.updateEmployee(this.employee);
+      }
+    } else if (this.mode === 'add') {
+      if (this.employee && Object.keys(this.employee).length > 0) {
+        this.hierarchyService.addEmployee(this.employee);
+      }
+    }
   }
 }

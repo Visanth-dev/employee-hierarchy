@@ -7,8 +7,10 @@ import { Employee } from '../entities/employee';
 import { BehaviorSubject } from 'rxjs';
 
 export interface Message {
-  error: string,
-  message: string,
+  message: string;
+}
+export interface Error {
+  message: string;
 }
 
 @Injectable({
@@ -23,7 +25,7 @@ export class HierarchyService {
   public subordinates = new BehaviorSubject<Employee[] | null>(
     [] as Employee[]
   );
-  public message = new BehaviorSubject<Message | null>(null)
+  public message = new BehaviorSubject<Message | Error | null>(null);
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +35,6 @@ export class HierarchyService {
       .subscribe((emps) => {
         this.employees.next(emps);
       });
-      console.log(this.employees)
   }
 
   getEmployee(id: number) {
@@ -59,9 +60,19 @@ export class HierarchyService {
 
   updateEmployee(employee: Employee) {
     this.http
-      .post<Message>(`http://localhost:5000/update`, employee)
+      .post<Message | Error>(`http://localhost:5000/update`, employee)
       .subscribe((response) => {
         this.message.next(response);
+        console.log(this.message.value);
+      });
+  }
+
+  addEmployee(employee: Employee) {
+    this.http
+      .post<Message | Error>(`http://localhost:5000/add`, employee)
+      .subscribe((response) => {
+        this.message.next(response);
+        console.log(this.message.value);
       });
   }
 }
