@@ -1,0 +1,13 @@
+<div mat-dialog-content>Delete employee?</div>
+<div mat-dialog-actions>
+  <button color="primary" mat-button mat-dialog-close>No</button>
+  <button
+    color="warn"
+    mat-button
+    mat-dialog-close
+    cdkFocusInitial
+    (click)="confirm.emit()"
+  >
+    Yes
+  </button>
+</div>
