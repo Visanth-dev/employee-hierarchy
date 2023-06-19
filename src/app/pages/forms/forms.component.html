@@ -4,7 +4,6 @@
   <form
     [formGroup]="myForm"
     class="form-add-container"
-    *ngIf="employee"
     (ngSubmit)="onSubmit($event)"
   >
     <mat-form-field>
@@ -58,13 +57,3 @@
     <button mat-raised-button color="primary">Submit</button>
   </form>
 </div>
-
-<!-- <div class="center">
-  <h1 mat-dialog-title>Response</h1>
-  <div mat-dialog-content>
-    {{ message }}
-  </div>
-  <div mat-dialog-actions>
-    <button mat-button mat-dialog-close>Close</button>
-  </div>
-</div> -->
