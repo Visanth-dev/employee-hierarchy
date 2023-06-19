@@ -1,4 +1,47 @@
-.employee-mat-card {
+.mat-card {
+  background-color: rgb(103, 58, 183);
+  color: rgb(255, 215, 64);
   margin-top: 50px;
   width: 300px;
+}
+
+.button-margin {
+  margin-top: 20px;
+}
+
+.margin-top {
+  margin-top: 50px;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input {
+  width: 150%;
+}
+
+.text-white {
+  text-align: center;
+  color: white;
+  /* background-color: white; */
+}
+
+.hierarchy-card {
+  background-color: rgb(103, 58, 183);
+  color: rgb(255, 215, 64);
+  width: 300px;
+  margin-top: 25px;
+}
+
+.subordinates {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-color {
+  color: rgb(255, 215, 64);
 }
