@@ -11,14 +11,14 @@ const routes: Routes = [
     path: 'add',
     loadChildren: () =>
       import('./pages/forms/forms.module').then(
-        (m) => m.FormUpdateModule
+        (m) => m.FormModule
       ),
   },
   {
-    path: 'update/:id/:name/:age/:address/:superior_id',
+    path: 'update/:id',
     loadChildren: () =>
       import('./pages/forms/forms.module').then(
-        (m) => m.FormUpdateModule
+        (m) => m.FormModule
       ),
   },
   {
