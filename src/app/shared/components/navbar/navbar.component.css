@@ -6,3 +6,7 @@
 .example-spacer {
   flex: 1 1 auto;
 }
+
+.nav-bar {
+  justify-content: space-around;
+}
