@@ -21,11 +21,6 @@ const routes: Routes = [
         (m) => m.FormModule
       ),
   },
-  {
-    path: 'delete',
-    loadChildren: () =>
-      import('./pages/delete/delete.module').then((m) => m.DeleteModule),
-  },
 ];
 
 @NgModule({
