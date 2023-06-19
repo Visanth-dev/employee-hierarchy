@@ -1,16 +1,12 @@
-<div class="center">
-  <a routerLink="/">Hierarchy</a>
-  Employee:
-  <a routerLink="/add">Add</a>
-</div>
+<app-navbar></app-navbar>
 
-<div class="center">
-  <form (submit)="getHierarchy()">
+<div class="center top-align">
+  <form class="search-container" (submit)="getEmployeeHierarchy()">
     <input
+      matInput
       class="input"
       type="text"
       [formControl]="nameControl"
-      matInput
       [matAutocomplete]="auto"
     />
 
@@ -18,53 +14,82 @@
       <mat-option
         *ngFor="let employee of employees"
         [value]="employee.name"
-        (click)="getEmployee(employee)"
+        (click)="employee_id = employee.id"
       >
         <h6>ID : {{ employee.id }}</h6>
         <h3>{{ employee.name }}</h3>
       </mat-option>
     </mat-autocomplete>
 
-    <button mat-raised-button color="primary" type="submit" value="Search">
+    <button
+      class="button-margin"
+      mat-raised-button
+      color="primary"
+      type="submit"
+      value="Search"
+    >
       Search
     </button>
   </form>
 </div>
 
-<div *ngIf="commandChain && subordinates">
+<div *ngIf="isEmployee && isCommandChain && isSubordinates">
   <div class="center">
-    <mat-card class="employee-mat-card" appearance="raised">
+    <mat-card class="mat-card" appearance="raised">
       <mat-card-header *ngIf="employee">
         <mat-card-title>{{ employee.name }}</mat-card-title>
         <mat-card-subtitle>ID: {{ employee.id }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-actions align="end">
-        <button mat-button routerLink="/update">Update</button>
-        <button mat-button routerLink="/delete">Delete</button>
+        <button
+          mat-flat-button
+          color="primary"
+          *ngIf="employee"
+          [routerLink]="['/update', employee.id]"
+        >
+          Update
+        </button>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="openConfirmationDialog()"
+        >
+          Delete
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <mat-tab-group
-    mat-stretch-tabs="false"
-    mat-align-tabs="center"
-    animationDuration="750ms"
-    dynamicHeight
-  >
-    <mat-tab label="Command Chain">
-      <div>
-        <h3 class="center" *ngFor="let employee of commandChain">
-          {{ employee.name }}
-        </h3>
-      </div>
-    </mat-tab>
+  <div class="margin-top">
+    <mat-tab-group
+      mat-stretch-tabs="false"
+      mat-align-tabs="center"
+      animationDuration="750ms"
+      dynamicHeight
+    >
+      <mat-tab label="Command Chain">
+        <div class="center search-container">
+          <mat-card
+            class="hierarchy-card center"
+            appearance="raised"
+            *ngFor="let employee of commandChain"
+          >
+            <mat-card-content>{{ employee.name }}</mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
 
-    <mat-tab label="Subordinates">
-      <div>
-        <h3 class="center" *ngFor="let employee of subordinates">
-          {{ employee.name }}
-        </h3>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+      <mat-tab label="Subordinates">
+        <div class="center subordinates">
+          <mat-card
+            class="hierarchy-card center"
+            appearance="raised"
+            *ngFor="let employee of subordinates"
+          >
+            <mat-card-content>{{ employee.name }}</mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>
