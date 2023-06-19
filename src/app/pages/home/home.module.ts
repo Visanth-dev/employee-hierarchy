@@ -13,12 +13,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { NavbarModule } from 'src/app/shared/components/navbar/navbar.module';
+import { DialogModule } from 'src/app/shared/components/dialog/dialog.module';
+import { ConfirmationDialogComponent } from './components/confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, ConfirmationDialogComponent],
   imports: [
     CommonModule,
     HomeRoutingModule,
@@ -32,6 +35,8 @@ import { NavbarModule } from 'src/app/shared/components/navbar/navbar.module';
     MatButtonModule,
     MatFormFieldModule,
     MatCardModule,
+    MatDialogModule,
+    DialogModule,
   ],
 })
 export class HomeModule {}
