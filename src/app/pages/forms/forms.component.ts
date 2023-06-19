@@ -1,130 +1,178 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, Validators } from '@angular/forms';
 
-import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
-import { HierarchyService } from 'src/app/services/hierarchy.service';
-
-import { Employee } from 'src/app/entities/employee';
-
-import { FormGroup, FormControl } from '@angular/forms';
 import { debounceTime } from 'rxjs';
 
-import { Router } from '@angular/router';
-
-export interface Message {
-  message: string;
-}
-export interface Error {
-  error: string;
-}
+import { HierarchyService } from 'src/app/services/hierarchy/hierarchy.service';
+import { Employee } from 'src/app/interfaces/employee';
+import { DialogComponent } from 'src/app/shared/components/dialog/dialog.component';
 
 @Component({
   selector: 'app-form-update',
   templateUrl: './forms.component.html',
   styleUrls: ['./forms.component.css'],
 })
-export class FormUpdateComponent implements OnInit {
-  myForm = new FormGroup({
-    name: new FormControl(''),
-    age: new FormControl(0),
-    address: new FormControl(''),
-    superior_id: new FormControl(),
+export class FormComponent implements OnInit {
+  // Form group for employee data
+  public myForm = this.formBuilder.group({
+    name: ['', Validators.required],
+    age: [0, [Validators.required, Validators.min(18)]],
+    address: ['', Validators.required],
+    superior_id: [''],
   });
-  public mode = '';
-  public employee: Employee | null = {} as Employee;
+
+  private isUpdate = true;
+
+  private employee: Employee | null = {} as Employee;
+  private isEmployee = false;
+
   public employees: Employee[] | null = [] as Employee[];
-  public response: Message | Error | null = null;
+
+  private response: string | null = '';
+
+  private SERVER_ERROR =
+    "Sorry, we're having trouble connecting. Check your internet connection and try again. If the problem persists, contact customer support.";
 
   constructor(
     private route: ActivatedRoute,
+    private formBuilder: FormBuilder,
     private hierarchyService: HierarchyService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
+  //
   ngOnInit(): void {
+    // Get route parameters and current URL
     const routeParams = this.route.snapshot.paramMap;
     const url = this.router.url;
 
+    // Check if URL includes 'update' to determine if updating or adding employee
+    // If 'update' then fetch employee details using id from route
     if (url.includes('update')) {
-      this.mode = 'update';
-      this.employee = {
-        id: Number(routeParams.get('id')),
-        name: String(routeParams.get('name')),
-        age: Number(routeParams.get('age')),
-        address: String(routeParams.get('address')),
-        superior_id: Number(routeParams.get('superior_id')),
-      };
+      this.isUpdate = true;
+
+      const employee_id = Number(routeParams.get('id'));
+
+      this.setEmployee(employee_id);
     } else {
-      this.mode = 'add';
+      this.isUpdate = false;
     }
 
-    if (this.employee && this.isEmployee(this.employee)) {
-      this.myForm.patchValue({
-        name: this.employee.name,
-        age: this.employee.age,
-        address: this.employee.address,
-        superior_id: this.employee.superior_id,
-      });
-    }
-
-    this.hierarchyService.employees.subscribe((emps) => {
-      this.employees = emps;
-    });
-
+    // Subscribe to changes in superior_id form control value
     this.myForm.controls.superior_id.valueChanges
       .pipe(debounceTime(500))
       .subscribe((superior) => {
-        if (superior && isNaN(superior)) {
+        // If superior value exists and is alphabetical, search for matching superior
+        if (superior && this.isAlpha(superior)) {
           this.searchMatchingSuperior(superior);
         }
       });
   }
 
-  isEmployee(employee: Employee) {
-    if (employee.name) {
-      if (employee.age) {
-        if (employee.address) {
-          return true;
-        }
-      }
+  private openResponseDialog() {
+    this.dialog.open(DialogComponent, { width: '500px', data: this.response });
+  }
+
+  private async setEmployee(employee_id: number) {
+    try {
+      await this.hierarchyService
+        .getEmployee<Employee>(employee_id)
+        .then((emp) => {
+          this.employee = emp as Employee;
+        });
+      this.isEmployee = true;
+      this.setFormValues();
+    } catch (error) {
+      error
+        ? (this.response = error as string)
+        : (this.response = this.SERVER_ERROR);
+      this.openResponseDialog();
     }
-    return false;
   }
 
-  searchMatchingSuperior(name: string) {
-    this.hierarchyService.getMatchingEmployees(name);
+  private setFormValues() {
+    // If employee data exists and is valid, set form values
+    if (this.isUpdate && this.isEmployee && this.employee) {
+      this.myForm.setValue({
+        name: this.employee.name,
+        age: this.employee.age,
+        address: this.employee.address,
+        superior_id: String(this.employee.superior_id),
+      });
+    }
   }
 
-  onSubmit(event: Event) {
+  //
+  // Check if string contains only alphabetical characters
+  private isAlpha(superior: string) {
+    return /^[a-zA-Z]+$/.test(superior);
+  }
+
+  //
+  // Search for matching superior using hierarchy service
+  private async searchMatchingSuperior(name: string) {
+    try {
+      await this.hierarchyService
+        .getMatchingEmployees<Employee[]>(name)
+        .then((value) => (this.employees = value as Employee[]));
+    } catch (error) {
+      this.response = error ? (error as string) : this.SERVER_ERROR;
+      this.openResponseDialog();
+    }
+  }
+
+  //
+  // Handle form submission
+  public async onSubmit(event: Event) {
     event.preventDefault();
 
-    if (
-      this.myForm.controls.name.value === '' ||
-      this.myForm.controls.age.value === null ||
-      this.myForm.controls.address.value === '' ||
-      this.myForm.controls.superior_id.value === ''
-    ) {
-      this.response = { error: 'Please fill all the fields' };
-      console.log(this.response);
+    // If form is valid, update employee data from form values
+    if (this.myForm.valid) {
+      this.updateEmployeeFromForm();
+      await this.updateOrAddEmployee();
     } else {
-      if (this.employee) {
-        this.employee.name = String(this.myForm.controls.name.value);
-        this.employee.age = Number(this.myForm.controls.age.value);
-        this.employee.address = String(this.myForm.controls.address.value);
-        this.employee.superior_id = Number(
-          this.myForm.controls.superior_id.value
-        );
-      }
+      // If form is invalid, set response error message
+      this.response = 'Please fill all the fields';
+      this.openResponseDialog();
     }
+  }
 
-    if (this.mode === 'update') {
-      if (this.employee && Object.keys(this.employee).length > 0) {
-        this.hierarchyService.updateEmployee(this.employee);
+  //
+  // Update employee data from form values
+  private updateEmployeeFromForm() {
+    if (this.employee) {
+      this.employee.name = String(this.myForm.controls.name.value);
+      this.employee.age = Number(this.myForm.controls.age.value);
+      this.employee.address = String(this.myForm.controls.address.value);
+      this.employee.superior_id = Number(
+        this.myForm.controls.superior_id.value
+      );
+    }
+    this.isEmployee = true;
+  }
+
+  //
+  // Update or add employee using hierarchy service based on isUpdate value
+  private async updateOrAddEmployee() {
+    if (this.employee && this.isEmployee) {
+      try {
+        if (this.isUpdate) {
+          this.response = await this.hierarchyService.updateEmployee(
+            this.employee
+          );
+        } else {
+          this.response = await this.hierarchyService.addEmployee(
+            this.employee
+          );
+        }
+      } catch (error) {
+        this.response = error ? (error as string) : this.SERVER_ERROR;
       }
-    } else if (this.mode === 'add') {
-      if (this.employee && Object.keys(this.employee).length > 0) {
-        this.hierarchyService.addEmployee(this.employee);
-      }
+      this.openResponseDialog();
     }
   }
 }
